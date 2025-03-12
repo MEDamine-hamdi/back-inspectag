@@ -21,7 +21,7 @@ app.use('/api', userRoutes);
 
 app.use('/api/printagents', printAgentRoutes);
 
-
+app.use("/api", require("./routes/orderRoutes"));
 // MongoDB connection
 mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost/inspectag', {
     useNewUrlParser: true,
