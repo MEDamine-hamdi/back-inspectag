@@ -7,6 +7,7 @@
     "express": "^4.21.2",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.10.1",
+    "reactjs-popup": "^2.0.6",
     "sweetalert2": "^11.17.2",
     "sweetalert2-react-content": "^5.1.0",
     "uuid": "^11.1.0"

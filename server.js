@@ -5,6 +5,8 @@ require('dotenv').config(); // Load environment variables
 const authRoutes = require('./routes/authRoutes');
 const userRoutes = require("./routes/userRoutes"); 
 const printAgentRoutes = require("./routes/printAgentRoutes");  // Import the routes
+const orderRoutes = require("./routes/orderRoutes");
+const statsRoutes = require("./routes/statsRoutes")
 
 const app = express();
 const port = process.env.PORT || 5000; // Use .env or default to 5000
@@ -15,13 +17,16 @@ app.use(express.json()); // body-parser is built-in in Express now
 
 // Use the auth routes
 app.use('/api', authRoutes);
-
 app.use('/api/users', userRoutes);
 app.use('/api', userRoutes);
-
 app.use('/api/printagents', printAgentRoutes);
-
+app.use("/api", orderRoutes);
 app.use("/api", require("./routes/orderRoutes"));
+app.use('/api/stats', statsRoutes);
+
+
+
+
 // MongoDB connection
 mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost/inspectag', {
     useNewUrlParser: true,
@@ -29,6 +34,9 @@ mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost/inspectag', {
 })
     .then(() => console.log('Connected to MongoDB'))
     .catch((error) => console.error('Failed to connect to MongoDB', error));
+
+
+
 
 // Start the server
 app.listen(port, () => {
