@@ -1,0 +1,8 @@
+const express = require('express');
+const router = express.Router();
+const commandeController = require('../controllers/commandeController');
+
+// Route to get all compared commandes
+router.get('/command', commandeController.getAllCompared);
+
+module.exports = router;

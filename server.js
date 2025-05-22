@@ -5,8 +5,11 @@ require('dotenv').config(); // Load environment variables
 const authRoutes = require('./routes/authRoutes');
 const userRoutes = require("./routes/userRoutes"); 
 const printAgentRoutes = require("./routes/printAgentRoutes");  // Import the routes
-const orderRoutes = require("./routes/orderRoutes");
+const orderRouter = require("./routes/orderRoutes");
 const statsRoutes = require("./routes/statsRoutes")
+const commandeRoutes = require('./routes/commandeRoutes');
+const compStatsRoutes = require('./routes/compStatsRoutes');
+const path = require('path');
 
 const app = express();
 const port = process.env.PORT || 5000; // Use .env or default to 5000
@@ -20,13 +23,15 @@ app.use('/api', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api', userRoutes);
 app.use('/api/printagents', printAgentRoutes);
-app.use("/api", orderRoutes);
 app.use("/api", require("./routes/orderRoutes"));
 app.use('/api/stats', statsRoutes);
-
-
-
-
+app.use('/api', commandeRoutes);
+app.use('/detected', express.static(path.join('D:/PFE/detected')));
+app.use('/detected', express.static(path.join(__dirname, 'detected')));
+app.use('/tested', express.static(path.join('D:/PFE/tested')));
+app.use('/api/comp-stats', compStatsRoutes);
+app.use('/', orderRouter);
+app.use("/api", orderRouter);
 // MongoDB connection
 mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost/inspectag', {
     useNewUrlParser: true,

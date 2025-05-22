@@ -1,13 +1,13 @@
-const Orders = require('../models/order'); // Adjust the path if needed
+const Orders = require('../models/order'); // Adjust path if needed
 
 // 1) Monthly defects by user
 exports.monthlyDefectsByUser = async (req, res) => {
   try {
     const results = await Orders.aggregate([
-      // Expand detections array then defects subarray
-      { $unwind: "$detections" },
-      { $unwind: "$detections.defects" },
-      // Group by month (from timestamp) and agent
+      { $unwind: "$results" },            // unwind results array
+      { $unwind: "$results.detections" }, // unwind detections inside results
+      { $unwind: "$results.detections.defects" }, // unwind defects inside detections
+
       {
         $group: {
           _id: {
@@ -17,7 +17,6 @@ exports.monthlyDefectsByUser = async (req, res) => {
           defectCount: { $sum: 1 }
         }
       },
-      // Project the needed fields and remove _id
       {
         $project: {
           month: "$_id.month",
@@ -40,16 +39,16 @@ exports.monthlyDefectsByUser = async (req, res) => {
 exports.sortedDefects = async (req, res) => {
   try {
     const results = await Orders.aggregate([
-      { $unwind: "$detections" },
-      { $unwind: "$detections.defects" },
-      // Group defects by their type and count them
+      { $unwind: "$results" },
+      { $unwind: "$results.detections" },
+      { $unwind: "$results.detections.defects" },
+
       {
         $group: {
-          _id: "$detections.defects.defect_type",
+          _id: "$results.detections.defects.defect_type",
           count: { $sum: 1 }
         }
       },
-      // Project to rename _id to defect_type and remove _id field
       {
         $project: {
           defect_type: "$_id",
@@ -71,16 +70,16 @@ exports.sortedDefects = async (req, res) => {
 exports.weeklyDayDefects = async (req, res) => {
   try {
     const results = await Orders.aggregate([
-      { $unwind: "$detections" },
-      { $unwind: "$detections.defects" },
-      // Group by day of the week extracted from the date Impression
+      { $unwind: "$results" },
+      { $unwind: "$results.detections" },
+      { $unwind: "$results.detections.defects" },
+
       {
         $group: {
           _id: { day: { $dayOfWeek: "$dateImpression" } },
           count: { $sum: 1 }
         }
       },
-      // Project to include day field
       {
         $project: {
           day: "$_id.day",
@@ -101,7 +100,6 @@ exports.weeklyDayDefects = async (req, res) => {
 // 4) Validation ratio (valid vs invalid)
 exports.validationRatio = async (req, res) => {
   try {
-    // Count orders marked as valid and invalid
     const validCount = await Orders.countDocuments({ validated: true });
     const invalidCount = await Orders.countDocuments({ validated: false });
     res.json({ valid: validCount, invalid: invalidCount });
